@@ -49,7 +49,7 @@ export const createSession = async (req, res, next) => {
     } while (attempts < maxAttempts);
 
     if (attempts >= maxAttempts) {
-      return res.status(500).json({ success: false, error: "Failed to generate unique room ID. Please try again" });
+      return res.status(500).json({ success: false, error: "Failed to generate unique room ID." });
     }
 
     const session = await Session.create({
