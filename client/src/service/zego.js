@@ -7,18 +7,16 @@ let userHasJoined = false;
 let isDestroying = false;
 
 export const generateKitToken = async (roomId, userId, userName) => {
+    const response = await api.get(`/session/zego-token?roomId=${roomId}`);
+    const { token } = response.data;
     const appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-    const appSign = process.env.REACT_APP_ZEGO_APP_SIGN;
-
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
         appId,
-        appSign,
+        token,
         roomId,
         userId.toString(),
-        userName || `User_${userId}`,
-        7200
+        userName
     );
-
     return kitToken;
 };
 
