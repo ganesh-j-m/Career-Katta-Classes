@@ -8,19 +8,16 @@ let isDestroying = false;
 
 export const generateKitToken = async (roomId, userId, userName) => {
     const appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-    const serverSecret = process.env.REACT_APP_ZEGO_SERVER_SECRET;
+    const appSign = process.env.REACT_APP_ZEGO_APP_SIGN;
 
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appId,
-        serverSecret,
+        appSign,
         roomId,
         userId.toString(),
-        userName || `User_${userId}`
+        userName || `User_${userId}`,
+        7200
     );
-
-    if (!kitToken) {
-        throw new Error('Token generation returned empty token');
-    }
 
     return kitToken;
 };
