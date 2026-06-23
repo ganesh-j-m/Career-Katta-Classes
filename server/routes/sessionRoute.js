@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import { getSession, createSession, leaveSession, endSession, JoinSession, listSession } from '../controllers/sessionControllers.js';
 import { protect } from '../middleware/auth.js';
 import { generateZegoToken } from '../utils/zegoToken.js';
+import { getSession, createSession, leaveSession, endSession, JoinSession, listSession } from '../controllers/sessionControllers.js';
 
 
 const router = express.Router();
