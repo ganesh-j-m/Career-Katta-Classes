@@ -7,16 +7,21 @@ let userHasJoined = false;
 let isDestroying = false;
 
 export const generateKitToken = async (roomId, userId, userName) => {
-    const response = await api.get(`/session/zego-token?roomId=${roomId}`);
-    const { token } = response.data;
     const appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
+    const serverSecret = process.env.REACT_APP_ZEGO_SERVER_SECRET;
+
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appId,
-        token,
+        serverSecret,
         roomId,
         userId.toString(),
-        userName
+        userName || `User_${userId}`
     );
+
+    if (!kitToken) {
+        throw new Error('Token generation returned empty token');
+    }
+
     return kitToken;
 };
 
