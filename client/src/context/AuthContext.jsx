@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../service/api";
 import { API_ENDPOINTS } from "../utils/constants";
-import { unstable_setDevServerHooks } from "react-router-dom";
-
 
 const AuthContext = createContext();
 
@@ -10,8 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  //check if user is authenticated on mount
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -30,7 +26,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
     checkAuth();
   }, []);
 
@@ -44,15 +39,11 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       const { user, token } = response.data.data;
-      //set token to localstorage
       localStorage.setItem("token", token);
-
-      //update user state
       setUser(user);
-
       return { success: true, user };
     } catch (error) {
-      const errorMessage = error.response.data?.error || "Registration failed";
+      const errorMessage = error.response?.data?.error || "Registration failed";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -69,15 +60,11 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       const { user, token } = response.data.data;
-      //set token to localstorage
       localStorage.setItem("token", token);
-
-      //update user state
       setUser(user);
-
       return { success: true, user };
     } catch (error) {
-      const errorMessage = error.response.data?.error || "Login failed";
+      const errorMessage = error.response?.data?.error || "Login failed";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -95,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     error,
-    isAuthenticated:!!user,
+    isAuthenticated: !!user,
     register,
     login,
     logout,
@@ -104,26 +91,17 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-          {children}
+      {children}
     </AuthContext.Provider>
-  )
+  );
 };
 
-
-
-
-// useAuth hook
-
-// custom hook to access auth context
-
-
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if(!context){
-        throw new Error('useAuth must be used within an AuthProvider')
-    }
-    return context;
-}
-
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
 export default AuthContext;

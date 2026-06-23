@@ -35,50 +35,47 @@ export const useZego = () => {
       setError(null);
 
       try {
-        // Container ready होण्यासाठी retry mechanism
+        //wait for container to be avaible with retry mechanism
         let retries = 0;
         const maxRetries = 30;
         while (!containerRef.current && retries < maxRetries) {
           await new Promise((resolve) => setTimeout(resolve, 100));
           retries++;
         }
-
         if (!containerRef.current) {
           throw new Error(
-            "Video container not ready after waiting. Please reload the page."
+            "video container not ready after waiting. Please the page",
           );
         }
 
         const container = containerRef.current;
         if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-          console.warn("Container has zero dimensions, waiting a bit more...");
+          console.warn("Container has zero deminsions, waiting a bot more...");
           await new Promise((resolve) => setTimeout(resolve, 500));
         }
 
-        // ✅ await आहे — joinRoom async असल्यामुळे token येण्याची वाट पाहतो
         await joinRoom(
           roomId,
           user.id,
           user.name,
           container,
           () => {
-            // onJoinCall
+            //onJoinCall
             setUserHasJoined(true);
           },
           () => {
-            // onLeaveCall
+            //onLeaveCall
             setUserHasJoined(false);
-          }
+          },
         );
-
         setIsJoined(true);
         joinedRoomIdRef.current = roomId;
-        return { success: true };
+        return {success:true}
       } catch (error) {
-        console.error("Failed to join zego room:", error);
+        console.error("failed to join zego room", error);
         const errorMessage =
           error.message ||
-          "Failed to join room. Please check your camera/microphone permissions and try again.";
+          "Failed to join room. Please check you camera.microphone permission and try again";
         setError(errorMessage);
         setIsJoined(false);
         setUserHasJoined(false);
@@ -89,7 +86,7 @@ export const useZego = () => {
         isJoiningRef.current = false;
       }
     },
-    [user]
+    [user],
   );
 
   const leaveZegoRoom = useCallback(async () => {
@@ -99,15 +96,14 @@ export const useZego = () => {
 
     isLeavingRef.current = true;
     try {
-      // ✅ await add केला — leaveRoom async असल्यास योग्यरित्या complete होतो
-      await leaveRoom(() => {
+      leaveRoom(() => {
         setUserHasJoined(false);
       });
       setIsJoined(false);
       setUserHasJoined(false);
       joinedRoomIdRef.current = null;
     } catch (error) {
-      console.error("Error leaving zego room:", error);
+      console.error("Error leaving zego room", error);
       setIsJoined(false);
       setUserHasJoined(false);
       joinedRoomIdRef.current = null;
@@ -119,31 +115,27 @@ export const useZego = () => {
   useEffect(() => {
     return () => {
       if (joinedRoomIdRef.current && !isLeavingRef.current) {
-        // ✅ async IIFE — useEffect cleanup async असू शकत नाही
-        (async () => {
-          try {
-            await leaveRoom();
-          } catch (error) {
-            console.error("Error in cleanup leaveRoom:", error);
-          }
-        })();
-
-        joinedRoomIdRef.current = null;
-        isJoiningRef.current = false;
-        isLeavingRef.current = false;
+        try {
+          leaveRoom();
+        } catch (error) {
+          console.error("Error in cleaup leave room", error);
+        }
+      joinedRoomIdRef.current = null;
+          isJoiningRef.current = false;
+          isLeavingRef.current = false;
       }
     };
   }, []);
 
   return {
-    // State
+    //state
     isJoined,
     userHasJoined,
     error,
     loading,
     containerRef,
 
-    // Methods
+    //Methods
     joinZegoRoom,
     leaveZegoRoom,
   };

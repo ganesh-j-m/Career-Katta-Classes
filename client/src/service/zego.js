@@ -2,19 +2,14 @@ import { ZegoUIKitPrebuilt } from '@zegocloud/zego-uikit-prebuilt';
 import { ZEGO_CONFIG } from '../utils/constants';
 import api from './api';
 
-
 let zegoInstance = null;
 let userHasJoined = false;
 let isDestroying = false;
 
-
-
 export const generateKitToken = async (roomId, userId, userName) => {
     const response = await api.get(`/session/zego-token?roomId=${roomId}`);
     const { token } = response.data;
-
     const appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
         appId,
         token,
@@ -22,96 +17,82 @@ export const generateKitToken = async (roomId, userId, userName) => {
         userId.toString(),
         userName
     );
-
     return kitToken;
 };
-
-
-//Request  brower permission for camera and mixrophone
 
 const requestMediaPermission = async () => {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
-        })
+        });
         stream.getTracks().forEach(track => track.stop());
         return true;
     } catch (error) {
         console.error('Failed to get media permission', error);
         return false;
     }
-}
+};
 
 export const joinRoom = async (roomId, userId, userName, container, onJoinCallback, onLeaveCallback) => {
     if (!container) {
-        throw new Error('Container element is required')
+        throw new Error('Container element is required');
     }
-
 
     if (!ZEGO_CONFIG.APP_ID) {
-        throw new Error('Zegocloud App Id is not configured')
+        throw new Error('Zegocloud App Id is not configured');
     }
 
-    //clean up exiting instance if any 
     if (zegoInstance && !isDestroying) {
         try {
             isDestroying = true;
             const instance = zegoInstance;
             zegoInstance = null;
-
-
             if (instance && typeof instance.destroy === 'function') {
                 instance.destroy();
             }
-
             userHasJoined = false;
         } catch (error) {
-            console.error('Error cleaning up exiting zego instance', error)
+            console.error('Error cleaning up existing zego instance', error);
         } finally {
             isDestroying = false;
         }
     }
 
-
     let hasPermission = false;
     try {
         hasPermission = await requestMediaPermission();
         if (!hasPermission) {
-            console.warn('Medai permission not granted upfront, SDK will request them')
+            console.warn('Media permission not granted upfront, SDK will request them');
         }
     } catch (error) {
-        console.warn('cound not pre-request permission ,SDK will handle it', error)
+        console.warn('Could not pre-request permission, SDK will handle it', error);
     }
-
 
     let kitToken;
     try {
-        kitToken = generateKitToken(roomId, userId, userName);
+        kitToken = await generateKitToken(roomId, userId, userName); // ← await add केला
         if (!kitToken) {
-            throw new Error('failed to generate kit token')
+            throw new Error('failed to generate kit token');
         }
     } catch (error) {
         console.error('token generation error', error);
-        throw new Error(`faild to generate zego token: ${error.message}`)
+        throw new Error(`failed to generate zego token: ${error.message}`);
     }
 
-    //Create a ZEGO UIkIT instance
     let zp;
     try {
         zp = ZegoUIKitPrebuilt.create(kitToken);
         if (!zp) {
-            throw new Error('failed to create zego Uikit instance')
+            throw new Error('failed to create zego UIKit instance');
         }
     } catch (error) {
         console.error('ZEGO instance creation error', error);
-        throw new Error(`faild to create Zego instace: ${error.message}`)
+        throw new Error(`failed to create Zego instance: ${error.message}`);
     }
 
-    //small delay
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    //join room with prebuild ui 
     try {
         zp.joinRoom({
             container: container,
@@ -138,30 +119,29 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
                 }
             },
             onError: (error) => {
-                console.error('ZEGO room error', error)
+                console.error('ZEGO room error', error);
             },
         });
     } catch (error) {
         console.error('Error joining Zego room', error);
         if (zp && typeof zp.destroy === 'function' && !isDestroying) {
             try {
-                isDestroying = false;
+                isDestroying = true;
                 zp.destroy();
             } catch (error) {
-                console.error('Error destring zego instance', error)
+                console.error('Error destroying zego instance', error);
             } finally {
                 isDestroying = false;
             }
         }
         zegoInstance = null;
         userHasJoined = false;
-        throw new Error(`Failed tp join room ${error.message}`)
+        throw new Error(`Failed to join room: ${error.message}`);
     }
+
     zegoInstance = zp;
     return zp;
-}
-
-
+};
 
 export const leaveRoom = (onLeaveCallback) => {
     if (!zegoInstance || isDestroying) {
@@ -171,18 +151,16 @@ export const leaveRoom = (onLeaveCallback) => {
         return;
     }
 
-
     isDestroying = true;
     const instance = zegoInstance;
     zegoInstance = null;
     userHasJoined = false;
 
-
     if (onLeaveCallback && typeof onLeaveCallback === 'function') {
         try {
             onLeaveCallback();
         } catch (error) {
-            console.error('error in leaveRoom callback', error)
+            console.error('error in leaveRoom callback', error);
         }
     }
 
@@ -193,18 +171,16 @@ export const leaveRoom = (onLeaveCallback) => {
             instance.leaveRoom();
         }
     } catch (error) {
-        console.error('Error leaving zego room', error)
+        console.error('Error leaving zego room', error);
     } finally {
         isDestroying = false;
     }
-}
-
+};
 
 export const getZegoInstance = () => {
     return zegoInstance;
-}
-
+};
 
 export const hasUserJoined = () => {
     return userHasJoined;
-}
+};
