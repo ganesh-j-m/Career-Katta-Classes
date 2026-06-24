@@ -35,7 +35,8 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
         console.warn('Permission error', error);
     }
 
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
+    // असं करा
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
         appId,
         appSign,
         roomId,
