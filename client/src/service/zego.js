@@ -17,7 +17,6 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
     if (!container) throw new Error('Container element is required');
 
     const appId = parseInt(process.env.REACT_APP_ZEGO_APP_ID);
-    const appSign = process.env.REACT_APP_ZEGO_APP_SIGN;
 
     if (zegoInstance) {
         try {
@@ -35,19 +34,14 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
         console.warn('Permission error', error);
     }
 
-    // असं करा
-    // आणि हे PASTE करा
-    // हे बदला
-    const kitToken = "04AAAAAGo8v3oAD...";
-
-    // असं करा
     const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appId,
-        "a6ee7618815238c63ab14a95fb8289f5",  // ServerSecret — Zegocloud console मधला
+        "a6ee7618815238c63ab14a95fb8289f5",
         roomId,
         userId.toString(),
         userName || `User_${userId}`
     );
+
     const zp = ZegoUIKitPrebuilt.create(kitToken);
 
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -93,5 +87,4 @@ export const leaveRoom = (onLeaveCallback) => {
 };
 
 export const getZegoInstance = () => zegoInstance;
-
 export const hasUserJoined = () => zegoInstance !== null;
