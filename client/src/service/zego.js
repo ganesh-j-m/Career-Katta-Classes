@@ -56,6 +56,9 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
         showAudioVideoSettingsButton: true,
         showTextChat: true,
         showUserList: true,
+        showScreenSharingButton: true,  // ✅ हे add करा
+        showRoomDetailsButton: true,     // ✅ Room info
+        showLeaveRoomConfirmDialog: true, // ✅ Leave confirm
         onJoinRoom: () => {
             if (onJoinCallback) onJoinCallback();
         },
