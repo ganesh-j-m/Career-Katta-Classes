@@ -36,13 +36,8 @@ export const joinRoom = async (roomId, userId, userName, container, onJoinCallba
     }
 
     // असं करा
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForProduction(
-        appId,
-        appSign,
-        roomId,
-        userId.toString(),
-        userName || `User_${userId}`
-    );
+    // आणि हे PASTE करा
+    const kitToken = "04AAAAAGo8v3oADBcISsY/cxANC7eW9gC0WJz6hacSW3PmsMbvUxlXZQwMCdfSMpVmaHlScJytTXzEKr/Y+Fcnx24B5qqu5mfbHU9h+cLqH+sifncqQryvpMA5Cx7CzKjFyttW6TbgUUPl62BR/OU0ruH9E7YhQ9hqwAO4rFh9oLwycCvincjTeXjKh+/qc4zTJW8bUhUuP6A/6BUmgm24406eUyW7trtD4n3ACnz5a3UbUAsbTY5qflNIMoHmANM4AT0guG0tKxVuKvaHAQ==";
 
     const zp = ZegoUIKitPrebuilt.create(kitToken);
 
